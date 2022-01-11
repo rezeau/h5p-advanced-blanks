@@ -400,6 +400,23 @@
         }
       },
       {
+        "name": "useRegex",
+        "importance": "low",
+        "type": "boolean",
+        "default": false,
+        "label": "Use Regular Expressions",
+        "description": "If enabled, correct and incorrect answers will be analysed using the regular expressions provided. Use this only if you know what you are doing!",
+        "widget": "showWhen",
+        "showWhen": {
+          "rules": [
+            {
+              "field": "mode",
+              "equals": "typing"
+            }
+          ]
+        }
+      },
+      {
         "name": "spellingErrorBehaviour",
         "type": "select",
         "label": "Behaviour when user makes a spelling error",

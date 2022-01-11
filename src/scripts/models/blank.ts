@@ -272,15 +272,20 @@ export class Blank extends ClozeElement {
   public evaluateAttempt(surpressTooltips: boolean, forceCheck?: boolean) {
     if (!this.hasPendingFeedback && this.lastCheckedText === this.enteredText && !forceCheck)
       return;
-
+    var useRegex = this.settings.useRegex;
     this.lastCheckedText = this.enteredText.toString();
     this.hasPendingFeedback = false;
     this.removeTooltip();
 
-    var exactCorrectMatches = this.correctAnswers.map(answer => answer.evaluateAttempt(this.enteredText)).filter(evaluation => evaluation.correctness === Correctness.ExactMatch).sort(evaluation => evaluation.characterDifferenceCount);
-    var closeCorrectMatches = this.correctAnswers.map(answer => answer.evaluateAttempt(this.enteredText)).filter(evaluation => evaluation.correctness === Correctness.CloseMatch).sort(evaluation => evaluation.characterDifferenceCount);
-    var exactIncorrectMatches = this.incorrectAnswers.map(answer => answer.evaluateAttempt(this.enteredText)).filter(evaluation => evaluation.correctness === Correctness.ExactMatch).sort(evaluation => evaluation.characterDifferenceCount);
-    var closeIncorrectMatches = this.incorrectAnswers.map(answer => answer.evaluateAttempt(this.enteredText)).filter(evaluation => evaluation.correctness === Correctness.CloseMatch).sort(evaluation => evaluation.characterDifferenceCount);
+    // Set checkCorrectness = true in order to detect that we are checking correct answers in answer.evaluateAttempt
+    var checkCorrectness = true;
+    var exactCorrectMatches = this.correctAnswers.map(answer => answer.evaluateAttempt(this.enteredText, checkCorrectness)).filter(evaluation => evaluation.correctness === Correctness.ExactMatch).sort(evaluation => evaluation.characterDifferenceCount);
+    // Done, now we can set checkCorrectness to false and test incorrect answers
+    checkCorrectness = false;
+    
+    var closeCorrectMatches = this.correctAnswers.map(answer => answer.evaluateAttempt(this.enteredText, checkCorrectness)).filter(evaluation => evaluation.correctness === Correctness.CloseMatch).sort(evaluation => evaluation.characterDifferenceCount);
+    var exactIncorrectMatches = this.incorrectAnswers.map(answer => answer.evaluateAttempt(this.enteredText, checkCorrectness)).filter(evaluation => evaluation.correctness === Correctness.ExactMatch).sort(evaluation => evaluation.characterDifferenceCount);
+    var closeIncorrectMatches = this.incorrectAnswers.map(answer => answer.evaluateAttempt(this.enteredText, checkCorrectness)).filter(evaluation => evaluation.correctness === Correctness.CloseMatch).sort(evaluation => evaluation.characterDifferenceCount);
 
     if (exactCorrectMatches.length > 0) {
       this.setAnswerState(MessageType.Correct);
@@ -291,9 +296,21 @@ export class Blank extends ClozeElement {
     }
 
     if (exactIncorrectMatches.length > 0) {
-      this.setAnswerState(MessageType.Error);
-      this.showErrorTooltip(exactIncorrectMatches[0].usedAnswer, surpressTooltips);
-      return;
+      if(!useRegex) {
+        this.setAnswerState(MessageType.Error);
+        this.showErrorTooltip(exactIncorrectMatches[0].usedAnswer, surpressTooltips);
+        return;
+      } else {
+        let catchAll = exactIncorrectMatches[0].usedAnswer.alternatives[0];
+        if (catchAll === '.*' && closeCorrectMatches.length > 0 && this.settings.warnSpellingErrors) {
+          this.displayTooltip(this.getSpellingMistakeMessage(closeCorrectMatches[0].usedAlternative, this.enteredText), MessageType.Retry, surpressTooltips);
+          this.setAnswerState(MessageType.Retry);
+        } else {
+          this.setAnswerState(MessageType.Error);
+          this.showErrorTooltip(exactIncorrectMatches[0].usedAnswer, surpressTooltips);
+        }
+        return;
+      }
     }
 
     if (closeCorrectMatches.length > 0) {

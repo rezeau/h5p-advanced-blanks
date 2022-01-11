@@ -9,6 +9,7 @@ export interface ISettings {
   enableCheckButton: boolean;
   autoCheck: boolean;
   caseSensitive: boolean;
+  useRegex: boolean;
   warnSpellingErrors: boolean;
   acceptSpellingErrors: boolean;
   showSolutionsRequiresInput: boolean;
@@ -26,6 +27,7 @@ export class H5PSettings implements ISettings {
   public enableCheckButton: boolean = true;
   public autoCheck: boolean = false;
   public caseSensitive: boolean = false;
+  public useRegex: boolean = false;
   public warnSpellingErrors: boolean = true;
   public acceptSpellingErrors: boolean = false;
   public showSolutionsRequiresInput: boolean = true;
@@ -56,6 +58,7 @@ export class H5PSettings implements ISettings {
     this.enableCheckButton = h5pConfigData.behaviour.enableCheckButton;
     this.autoCheck = h5pConfigData.behaviour.autoCheck;
     this.caseSensitive = h5pConfigData.behaviour.caseSensitive;
+    this.useRegex = h5pConfigData.behaviour.useRegex;
     this.warnSpellingErrors = h5pConfigData.behaviour.spellingErrorBehaviour === "warn";
     this.acceptSpellingErrors = h5pConfigData.behaviour.spellingErrorBehaviour === "accept";
     this.showSolutionsRequiresInput = h5pConfigData.behaviour.showSolutionsRequiresInput;
@@ -73,6 +76,13 @@ export class H5PSettings implements ISettings {
     if (this.clozeType === ClozeType.Type) {
       this.selectAlternatives = SelectAlternatives.All;
       this.selectAlternativeRestriction = 0;
+      if (this.useRegex) {
+        this.acceptSpellingErrors = false;
+      }
+      if (this.autoCheck) {
+        this.confirmCheckDialog = false;
+        this.confirmRetryDialog = false;
+      }
     } else {
       if (this.selectAlternativeRestriction === SelectAlternatives.Alternatives) {
         this.selectAlternativeRestriction = 0;
@@ -80,6 +90,7 @@ export class H5PSettings implements ISettings {
       this.warnSpellingErrors = false;
       this.acceptSpellingErrors = false;
       this.caseSensitive = false;
+      this.useRegex = false;
     }
   }
 }

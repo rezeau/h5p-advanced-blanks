@@ -11,3 +11,39 @@ export function shuffleArray(array: any[]) {
   }
   return array;
 }
+
+export function checkBalancedBrackets(alternatives) {
+  let balancedBrackets = true;
+  var wrongAlternatives = [];
+  for (var alternative of alternatives) {
+    if (alternative) {
+      var parensOpen = 0;
+      var parensClose = 0;
+      var sqbracketsOpen = 0;
+      var sqbracketsClose = 0;
+      // Walk the $myregexp string to find parentheses and square brackets.
+      for (let $i = 0; $i < alternative.length; $i++) {
+        switch (alternative[$i]) {
+            case '(': parensOpen++;
+              break;
+            case ')': if (parensOpen) {parensOpen--;} else{parensClose++};
+              break;
+            case '[': sqbracketsOpen++;
+              break;
+            case ']': if (sqbracketsOpen) {sqbracketsOpen--} else{sqbracketsClose++};
+              break;
+            default:
+              break;
+        }
+      }       
+      if (parensOpen !== 0 || parensClose !== 0 || sqbracketsOpen !== 0 || sqbracketsClose !== 0) {
+        balancedBrackets = false;
+        wrongAlternatives.push(alternative);
+      }
+    }
+  }
+  if (balancedBrackets) {
+    return null;
+  }
+  return wrongAlternatives.join('\n');
+}

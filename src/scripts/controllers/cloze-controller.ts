@@ -62,7 +62,7 @@ export class ClozeController {
 
       // Detect small mistakes
       const closeCorrectMatches = b.correctAnswers
-        .map(answer => answer.evaluateAttempt(b.enteredText))
+        .map(answer => answer.evaluateAttempt(b.enteredText, false))
         .filter(evaluation => evaluation.correctness === Correctness.CloseMatch);
       const similarAnswerGiven = this.settings.acceptSpellingErrors && closeCorrectMatches.length > 0;
 
