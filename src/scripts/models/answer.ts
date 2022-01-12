@@ -128,13 +128,32 @@ export class Answer {
    * @param  {string} attempt The text entered by the user.
    * @returns Evaluation indicates if the entered text is matched by the answer.
    */
-  public evaluateAttempt(attempt: string): Evaluation {
+  public evaluateAttempt(attempt: string, checkCorrectness): Evaluation {
     var cleanedAttempt = this.cleanString(attempt);
     var evaluation = new Evaluation(this);
-
+    var useRegex = this.settings.useRegex;
     for (var alternative of this.alternatives) {
       var cleanedAlternative = this.cleanString(alternative);
-
+      if (useRegex && !checkCorrectness) {
+        
+        /* Checking for missing word(s) in student's attempt.
+          Replace the initial double -- with proper lookBehind expression.
+        */
+        if (cleanedAlternative.substr(0, 2) === '--') {
+          cleanedAlternative = cleanedAlternative.substr(2);
+          cleanedAlternative = "^(?!.*" + cleanedAlternative + ".*)";
+        }
+      
+        var ignoreCase = (this.settings.caseSensitive) ? "" : "i";
+        const regex = new RegExp(cleanedAlternative, ignoreCase);
+        const str = cleanedAttempt;
+        let m;
+        if ((m = regex.exec(str)) !== null) {
+          evaluation.usedAlternative = cleanedAttempt;
+          evaluation.correctness = Correctness.ExactMatch;
+          return evaluation;
+        }
+      }
       var diff = jsdiff.diffChars(cleanedAlternative, cleanedAttempt,
         { ignoreCase: !this.settings.caseSensitive });
       var changeCount = this.getChangesCountFromDiff(diff);
@@ -143,7 +162,7 @@ export class Answer {
         evaluation.usedAlternative = cleanedAlternative;
         evaluation.correctness = Correctness.ExactMatch;
         return evaluation;
-      }
+        }
 
       if (changeCount <= this.getAcceptableSpellingMistakes(alternative)
         && (evaluation.characterDifferenceCount === 0 || changeCount < evaluation.characterDifferenceCount)) {

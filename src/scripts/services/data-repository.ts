@@ -4,6 +4,7 @@ import { Snippet } from "../models/snippet";
 import { ISettings } from "../services/settings";
 import { H5PLocalization } from "./localization";
 import { Unrwapper } from '../helpers/unwrapper';
+import { checkBalancedBrackets } from "../../lib/helpers";
 
 export interface IDataRepository {
   getBlanks(): Blank[];
@@ -49,6 +50,31 @@ export class H5PDataRepository implements IDataRepository {
 
     if (!this.h5pConfigData.content.blanksList)
       return blanks;
+
+    // If use RegExp then check Balanced Brackets.
+    if (this.h5pConfigData.behaviour.useRegex) {
+      var unBalancedBrackets = [];
+      for (var i = 0; i < this.h5pConfigData.content.blanksList.length; i++) {
+        var h5pBlank = this.h5pConfigData.content.blanksList[i];
+        var correctText = h5pBlank.correctAnswerText;
+        if (correctText === "" || correctText === undefined)
+          continue;
+        if (h5pBlank.incorrectAnswersList) {
+          var incorrectAnswersList = [];
+          for (var incorrectAnswer of h5pBlank.incorrectAnswersList) {
+            incorrectAnswersList.push(incorrectAnswer.incorrectAnswerText);
+          }
+          var checkBrackets = checkBalancedBrackets(incorrectAnswersList);
+          if (checkBrackets !== null) {
+            unBalancedBrackets.push('\nBlank # ' + (i + 1), checkBrackets);
+          }
+          if (unBalancedBrackets.length !== 0) {
+            alert ('ERROR!!! Your round or square brackets are not correctly balanced in the following regular expression(s): \n' + unBalancedBrackets.join('\n'));
+            throw new Error('Round or square brackets not correctly balanced in your Regular Expressions');
+          }
+        }
+      }
+    }
 
     for (var i = 0; i < this.h5pConfigData.content.blanksList.length; i++) {
       var h5pBlank = this.h5pConfigData.content.blanksList[i];
