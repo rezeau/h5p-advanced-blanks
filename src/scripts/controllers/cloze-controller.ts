@@ -280,6 +280,12 @@ export class ClozeController {
 
     for (var blank of this.cloze.blanks) {
       var blankRactive = this.blankRactives[blank.id];
+      if (blank.isCorrect || blank.isShowingSolution) {
+        var l = blank.enteredText.length;
+        blank.currTextLength = l * 0.97;
+      } else  {
+        blank.currTextLength = blank.minTextLength;
+      }
       blankRactive.set("blank", blank);
     }
   }

@@ -28,6 +28,7 @@ export class Blank extends ClozeElement {
   isShowingSolution: boolean;
   message: string;
   minTextLength: number;
+  currTextLength: number;
   speechBubble: any;
 
   /**
@@ -106,6 +107,7 @@ export class Blank extends ClozeElement {
     var longestAnswer = getLongestString(answers);
     var l = longestAnswer.length;
     this.minTextLength = Math.max(10, l - (l % 10) + 10);
+    this.currTextLength = this.minTextLength;
   }
 
   /**
@@ -194,7 +196,11 @@ export class Blank extends ClozeElement {
     this.removeTooltip();
     if (this.isCorrect)
       return;
-    this.enteredText = this.correctAnswers[0].alternatives[0];
+    if (this.settings.showAllSolutions) {
+      this.enteredText = this.correctAnswers[0].alternatives.join(" | ");
+    } else {
+      this.enteredText = this.correctAnswers[0].alternatives[0];
+    }
     this.setAnswerState(MessageType.ShowSolution);
   }
 

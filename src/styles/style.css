@@ -32,7 +32,7 @@
     font-size: 1em;
     border-radius: 0.25em;
     border: 1px solid #a0a0a0;
-    padding: 0.1875em 1.5em 0.1875em 0.5em;
+    padding: 0.1875em 0.2em 0.1875em 0.5em;
     text-overflow: ellipsis;
     overflow: hidden;
 }
@@ -82,7 +82,6 @@ select.h5p-text-input {
     border-color: #7fb8ff;
 }
 
-
 /* Correctly answered input */
 
 .h5p-advanced-blanks .blank.correct .h5p-text-input {
@@ -93,15 +92,22 @@ select.h5p-text-input {
 
 .h5p-advanced-blanks .blank.correct .h5p-input-wrapper:after {
     position: absolute;
-    right: 0.5em;    
-    top: 50%;
+    right: 0px;    
     transform: translateY(-50%);
     text-decoration: none;
     content: "\f00c";
     font-family: 'H5PFontAwesome4';
     color: #255c41;
+    top:5px;
 }
 
+/* Spelling errors */
+
+.h5p-advanced-blanks .blank.retry .h5p-text-input {
+    background-color: #ffff99;
+    border: 1px solid #ffff99;
+    color: black;
+}
 
 /* Incorrect answers */
 
@@ -112,10 +118,13 @@ select.h5p-text-input {
     text-decoration: line-through;
 }
 
-.h5p-advanced-blanks .blank.error .h5p-input-wrapper:after {
+.h5p-advanced-blanks .blank.error .h5p-input-wrapper:after,
+.h5p-advanced-blanks .blank.retry .h5p-input-wrapper:after,
+.h5p-advanced-blanks .blank.has-tip.error .h5p-input-wrapper:after,
+.h5p-advanced-blanks .blank.has-tip.retry .h5p-input-wrapper:after {
     position: absolute;
-    right: 0.5em;
-    top: 50%;
+    right: 0px;
+    top: 5px;
     transform: translateY(-50%);
     font-family: 'H5PFontAwesome4';
     text-decoration: none;
@@ -123,26 +132,10 @@ select.h5p-text-input {
     color: #b71c1c;
 }
 
-
-/* Spelling errors */
-
-.h5p-advanced-blanks .blank.retry .h5p-text-input {
-    background-color: #ffff99;
-    border: 1px solid #ffff99;
-    color: black;
+.h5p-advanced-blanks .blank.has-tip.error .h5p-input-wrapper:after,
+.h5p-advanced-blanks .blank.has-tip.retry .h5p-input-wrapper:after {
+    right: 1.4em;
 }
-
-.h5p-advanced-blanks .blank.retry .h5p-input-wrapper:after {
-    position: absolute;
-    right: 0.5em;
-    top: 50%;
-    transform: translateY(-50%);
-    font-family: 'H5PFontAwesome4';
-    text-decoration: none;
-    content: "\f00d";
-    color: #b71c1c;
-}
-
 
 /* Buttons */
 
@@ -210,29 +203,33 @@ select.h5p-text-input {
 
 
 /* Tips */
-
+/* papi Jo position tip in the top right corner */
 .h5p-advanced-blanks .h5p-tip-container {
   position: absolute;
-  top: 50%;
   transform: translateY(-50%);
-  right: 0.4em;
-  font-size: 1em;
+  right: 0em;
+  top: 0.7em;
 }
 
-.h5p-advanced-blanks .blank.has-tip:not(.correct):not(.error):not(.retry) .h5p-text-input {
+.h5p-advanced-blanks .joubel-tip-container {
+  display: inline;
+  padding-top: 6px;
+}
+
+.h5p-advanced-blanks .blank.has-tip:not(.correct):not(.error):not(.retry):not(.showing-solution) .h5p-text-input {
     padding-right: 2.25em;
 }
-
+/* papi Jo these settings do not seem necessary */
 .h5p-advanced-blanks .blank.has-tip.correct .h5p-input-wrapper:after,
 .h5p-advanced-blanks .blank.has-tip.error .h5p-input-wrapper:after,
 .h5p-advanced-blanks .blank.has-tip.retry .h5p-input-wrapper:after {
-    right: 2.25em;
+    //right: 2.25em;
 }
 
 .h5p-advanced-blanks .blank.correct.has-tip .h5p-text-input,
 .h5p-advanced-blanks .blank.error.has-tip .h5p-text-input,
 .h5p-advanced-blanks .blank.retry.has-tip .h5p-text-input {
-    padding-right: 3.5em;
+    //padding-right: 3.5em;
 }
 
 /* improves appearance of h5p tip shadows */
@@ -278,6 +275,11 @@ select.h5p-text-input {
 .h5p-advanced-blanks .h5p-advanced-blanks-type-mode .blank.retry.has-pending-feedback .h5p-input-wrapper:before {
     color: #ffff00;
     text-shadow: 0px 0px 0.5em black;
+}
+/* papi Jo color green for correct answer feedback button */
+.h5p-advanced-blanks .h5p-advanced-blanks-select-mode .blank.correct.has-pending-feedback button.h5p-notification,
+.h5p-advanced-blanks .h5p-advanced-blanks-type-mode .blank.correct.has-pending-feedback .h5p-input-wrapper:before {
+    color: #267d53;
 }
 
 @keyframes shake {
