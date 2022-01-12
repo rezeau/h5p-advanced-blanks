@@ -13,9 +13,11 @@ export class Blank extends ClozeElement {
   correctAnswers: Answer[];
   incorrectAnswers: Answer[];
   hint: Message;
+  correctFeedback: string;
   id: string;
   choices: string[];
   hasHint: boolean;
+  hasCorrectFeedback: boolean;
 
   // viewmodel stuff
 
@@ -36,6 +38,7 @@ export class Blank extends ClozeElement {
    * @param  {ISettings} settings
    * @param  {string} id
    * @param  {string} correctText?
+   * @param  {string} correctFeedback?
    * @param  {string} hintText?
    */
   constructor(private settings: ISettings, private localization: H5PLocalization, private jquery: JQueryStatic, private messageService: MessageService, id: string) {
@@ -194,6 +197,7 @@ export class Blank extends ClozeElement {
     this.removeTooltip();
     if (this.isCorrect)
       return;
+    this.hasPendingFeedback = false;
     this.enteredText = this.correctAnswers[0].alternatives[0];
     this.setAnswerState(MessageType.ShowSolution);
   }
@@ -289,6 +293,9 @@ export class Blank extends ClozeElement {
 
     if (exactCorrectMatches.length > 0) {
       this.setAnswerState(MessageType.Correct);
+      if (this.hasCorrectFeedback) {
+        this.displayTooltip(this.correctFeedback, MessageType.Correct, surpressTooltips);
+      }
       if (!this.settings.caseSensitive) {
         this.enteredText = exactCorrectMatches[0].usedAlternative;
       }

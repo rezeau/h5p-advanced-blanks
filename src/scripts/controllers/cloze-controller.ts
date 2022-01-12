@@ -212,11 +212,9 @@ export class ClozeController {
   private createAndAddContainers(addTo: HTMLElement): { cloze: HTMLDivElement } {
     var clozeContainerElement = document.createElement('div');
     clozeContainerElement.id = 'h5p-cloze-container';
-    if (this.settings.clozeType === ClozeType.Select) {
-      clozeContainerElement.className = 'h5p-advanced-blanks-select-mode';
-    } else {
-      clozeContainerElement.className = 'h5p-advanced-blanks-type-mode';
-    }
+    // papi Jo use same className for select and edit modes, to display the feedback-pending button for correct answers.
+    clozeContainerElement.className = 'h5p-advanced-blanks-select-mode';
+
     addTo.appendChild(clozeContainerElement);
 
     return {
