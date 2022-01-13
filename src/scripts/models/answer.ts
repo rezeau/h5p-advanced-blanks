@@ -45,7 +45,9 @@ export class Answer {
    * @param  {string} reaction - The tooltip that should be displayed. Format: Tooltip Text;!!-1!! !!+1!!
    */
   constructor(answerText: string, reaction: string, showHighlight: boolean, highlight: number, private settings: ISettings) {
-    this.alternatives = answerText.split(/\//).map(s => s.trim());
+    //this.alternatives = answerText.split(/\//).map(s => s.trim());
+    const ESCAPED_SLASH_REPLACEMENT = '\u250C'; // no-width space character
+    this.alternatives = answerText.split(/\//).map(s => s.replace(ESCAPED_SLASH_REPLACEMENT, '/'));
     this.message = new Message(reaction, showHighlight, highlight);
     if (answerText.trim() === "") {
       this.appliesAlways = true;
@@ -123,6 +125,7 @@ export class Answer {
 
     return acceptableTypoCount;
   }
+    
   /**
    * Checks if the text entered by the user in an ettempt is matched by the answer,
    * @param  {string} attempt The text entered by the user.

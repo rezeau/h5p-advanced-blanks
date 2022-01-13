@@ -47,7 +47,8 @@ export class H5PDataRepository implements IDataRepository {
 
   getBlanks(): Blank[] {
     var blanks: Blank[] = new Array();
-
+    const ESCAPED_SLASH_REPLACEMENT = '\u250C'; // no-width space character
+      
     if (!this.h5pConfigData.content.blanksList)
       return blanks;
 
@@ -78,14 +79,31 @@ export class H5PDataRepository implements IDataRepository {
 
     for (var i = 0; i < this.h5pConfigData.content.blanksList.length; i++) {
       var h5pBlank = this.h5pConfigData.content.blanksList[i];
+        var incorrectAnswersList = [];
 
       var correctText = h5pBlank.correctAnswerText;
+      
       var correctFeedback = h5pBlank.correctFeedback;
       if (correctText === "" || correctText === undefined)
         continue;
-
+      // Deal with potential escaped forward slash in correct & incorrect answers.
+      let re = /\\\//g;
+      if (correctText.match(re)) {
+        correctText = correctText.replace(re, ESCAPED_SLASH_REPLACEMENT);
+      }
+      if (h5pBlank.incorrectAnswersList) {
+        // Find if there is at least one occurrence of re in the list of incorrect answers.
+        if (h5pBlank.incorrectAnswersList.some(e => e.incorrectAnswerText.match(re))) {
+          for (var incorrectAnswer of h5pBlank.incorrectAnswersList) {
+            incorrectAnswer.incorrectAnswerText = incorrectAnswer.incorrectAnswerText.replace(re, ESCAPED_SLASH_REPLACEMENT);
+            incorrectAnswersList.push(incorrectAnswer);
+          }
+        } else {
+          incorrectAnswersList = h5pBlank.incorrectAnswersList;
+        }
+      }
       var blank = BlankLoader.instance.createBlank("cloze" + i, correctText, correctFeedback,
-        h5pBlank.hint, h5pBlank.incorrectAnswersList);
+        h5pBlank.hint, incorrectAnswersList);
 
       blank.finishInitialization();
       blanks.push(blank);

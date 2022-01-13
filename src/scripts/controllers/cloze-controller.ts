@@ -27,7 +27,6 @@ interface Solved {
 interface Typed {
   (): void;
 }
-
 export class ClozeController {
   private jquery: JQuery;
 
@@ -56,16 +55,19 @@ export class ClozeController {
   }
 
   public get currentScore(): number {
+    var useRegex = this.settings.useRegex;
     const score = this.cloze.blanks.reduce((score, b) => {
       const notShowingSolution = !b.isShowingSolution;
-      const correctAnswerGiven = b.correctAnswers[0].alternatives.indexOf(b.enteredText || '') !== -1;
-
+      let correctAnswerGiven = false;
+      let similarAnswerGiven = false;
+      let closeCorrectMatches;
       // Detect small mistakes
-      const closeCorrectMatches = b.correctAnswers
-        .map(answer => answer.evaluateAttempt(b.enteredText, false))
-        .filter(evaluation => evaluation.correctness === Correctness.CloseMatch);
-      const similarAnswerGiven = this.settings.acceptSpellingErrors && closeCorrectMatches.length > 0;
-
+        closeCorrectMatches = b.correctAnswers
+          .map(answer => answer.evaluateAttempt(b.enteredText, false))
+          .filter(evaluation => evaluation.correctness === Correctness.CloseMatch);
+        similarAnswerGiven = this.settings.acceptSpellingErrors && closeCorrectMatches.length > 0;
+        correctAnswerGiven = b.correctAnswers[0].alternatives.indexOf(b.enteredText || '') !== -1;
+      
       return score += (notShowingSolution && (correctAnswerGiven || similarAnswerGiven)) ? 1 : 0;
     }, 0);
 
@@ -214,7 +216,7 @@ export class ClozeController {
     clozeContainerElement.id = 'h5p-cloze-container';
     // papi Jo use same className for select and edit modes, to display the feedback-pending button for correct answers.
     clozeContainerElement.className = 'h5p-advanced-blanks-select-mode';
-
+    
     addTo.appendChild(clozeContainerElement);
 
     return {
@@ -278,6 +280,12 @@ export class ClozeController {
 
     for (var blank of this.cloze.blanks) {
       var blankRactive = this.blankRactives[blank.id];
+      if (blank.isCorrect || blank.isShowingSolution) {
+        var l = blank.enteredText.length;
+        blank.currTextLength = l * 0.97;
+      } else  {
+        blank.currTextLength = blank.minTextLength;
+      }
       blankRactive.set("blank", blank);
     }
   }

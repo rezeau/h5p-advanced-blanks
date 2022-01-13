@@ -30,6 +30,7 @@ export class Blank extends ClozeElement {
   isShowingSolution: boolean;
   message: string;
   minTextLength: number;
+  currTextLength: number;
   speechBubble: any;
 
   /**
@@ -49,7 +50,6 @@ export class Blank extends ClozeElement {
     this.incorrectAnswers = new Array();
     this.choices = new Array();
     this.type = ClozeElementType.Blank;
-
     this.id = id;
   }
 
@@ -79,7 +79,12 @@ export class Blank extends ClozeElement {
     this.hint = message;
     this.hasHint = this.hint.text !== "";
   }
-
+/*
+  public setCorrectFeedback(correctFeedback: string) {
+    this.correctFeedback = correctFeedback;
+    this.hasCorrectFeedback = this.correctFeedback !== "";
+  }
+*/
   /**
    * Adds the incorrect answer to the list.
    * @param text - What the user must enter.
@@ -91,7 +96,7 @@ export class Blank extends ClozeElement {
   }
 
   /**
-   * Returns how many characters the input box must have be to allow for all correct answers.
+   * Returns how many characters the input box must have to allow for all correct answers.
    */
   // TODO: refactor
   private calculateMinTextLength(): void {
@@ -105,10 +110,10 @@ export class Blank extends ClozeElement {
         answers.push(getLongestString(incorrectAnswer.alternatives));
       }
     }
-
     var longestAnswer = getLongestString(answers);
     var l = longestAnswer.length;
     this.minTextLength = Math.max(10, l - (l % 10) + 10);
+    this.currTextLength = this.minTextLength;
   }
 
   /**
@@ -198,7 +203,12 @@ export class Blank extends ClozeElement {
     if (this.isCorrect)
       return;
     this.hasPendingFeedback = false;
-    this.enteredText = this.correctAnswers[0].alternatives[0];
+    
+    if (this.settings.showAllSolutions) {
+      this.enteredText = this.correctAnswers[0].alternatives.join(" | ");
+    } else {
+      this.enteredText = this.correctAnswers[0].alternatives[0];
+    }
     this.setAnswerState(MessageType.ShowSolution);
   }
 
@@ -280,7 +290,7 @@ export class Blank extends ClozeElement {
     this.lastCheckedText = this.enteredText.toString();
     this.hasPendingFeedback = false;
     this.removeTooltip();
-
+    
     // Set checkCorrectness = true in order to detect that we are checking correct answers in answer.evaluateAttempt
     var checkCorrectness = true;
     var exactCorrectMatches = this.correctAnswers.map(answer => answer.evaluateAttempt(this.enteredText, checkCorrectness)).filter(evaluation => evaluation.correctness === Correctness.ExactMatch).sort(evaluation => evaluation.characterDifferenceCount);
