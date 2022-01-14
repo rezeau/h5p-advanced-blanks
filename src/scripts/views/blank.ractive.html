@@ -1,8 +1,7 @@
 <span id="container{{id}}" class="blank {{#if blank.hasPendingFeedback}}has-pending-feedback{{/if}} {{#if blank.hasHint}}has-tip{{/if}} {{#if blank.isCorrect}}correct{{/if}} {{#if blank.isError}}error{{/if}} {{#if blank.isRetry}}retry{{/if}} {{#if blank.isShowingSolution}}showing-solution{{/if}}">
     <button class="h5p-notification" 
     on-click="@this.fire('displayFeedback', blank)"
-    on-escape="@this.fire('closeMessage', blank)" 
-    on-blur="@this.fire('checkBlank', blank, 'blur')"     
+    on-escape="@this.fire('closeMessage', blank)"
     >
       &#xf05a;
     </button>
