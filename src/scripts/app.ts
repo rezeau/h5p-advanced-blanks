@@ -50,6 +50,7 @@ export default class AdvancedBlanks extends (H5P.Question as { new(): any; }) {
     super();
 
     // Set mandatory default values for editor widgets that create content type instances
+    /*
     config = extend({
       content: {
         blanksText: ''
@@ -59,7 +60,7 @@ export default class AdvancedBlanks extends (H5P.Question as { new(): any; }) {
         selectAlternatives: 'alternatives'
       }
     }, config);
-
+*/
     this.jQuery = H5P.jQuery;
     this.contentId = contentId;
 

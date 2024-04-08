@@ -235,9 +235,62 @@ export class ClozeController {
   }
 
   private createBlankBinding(blank: Blank) {
+  
+  // To solve this error: Uncaught Error: The template parser was passed a non-string template, but the template doesn't have a version.  Make sure you're passing in the template you think you are. I copy here the contents of file h5p-advanced-blanks\src\scripts\views\blank.ractive.html and converts it to one big string.
+  const templateString: string = `
+  <span id="container{{id}}" class="blank {{#blank.hasPendingFeedback}}has-pending-feedback{{/if}} {{#blank.hasHint}}has-tip{{/if}} {{#blank.isCorrect}}correct{{/if}} {{#blank.isError}}error{{/if}} {{#blank.isRetry}}retry{{/if}} {{#blank.isShowingSolution}}showing-solution{{/if}}">
+    {{#unless isSelectCloze}}
+      <span class="h5p-input-wrapper">
+        <input id="{{blank.id}}" type="text" value="{{blank.enteredText}}" 
+               size="{{blank.minTextLength}}" on-escape="@this.fire('closeMessage', blank)" 
+               on-enter="@this.fire('checkBlank', blank, 'enter')" 
+               on-blur="@this.fire('checkBlank', blank, 'blur')" 
+               on-focus="@this.fire('focus', blank)"
+               on-anykey="@this.fire('textTyped', blank)"
+               {{#(blank.isCorrect || blank.isShowingSolution)}}disabled="disabled"{{/if}}
+               class="h5p-text-input"
+               autocomplete="off"
+               autocapitalize="off"/>
+        {{#blank.hasHint}}
+          <span class="h5p-tip-container">
+            <button on-click="@this.fire('showHint', blank)" {{#(blank.isCorrect || blank.isShowingSolution)}}disabled="disabled" {{/if}}>
+              <span class="joubel-tip-container" title="Tip" aria-label="Tip" aria-expanded="true" role="button" tabindex="0"><span class="joubel-icon-tip-normal "><span class="h5p-icon-shadow"></span><span class="h5p-icon-speech-bubble"></span><span class="h5p-icon-info"></span></span></span>
+            </button>
+          </span>
+        {{/if}}
+      </span>    
+    {{/unless}}
+    {{#if isSelectCloze}}
+        <button class="h5p-notification" on-click="@this.fire('displayFeedback', blank)">
+          &#xf05a;
+        </button>
+        <span class="h5p-input-wrapper">      
+        <select id="{{blank.id}}" type="text" value="{{blank.enteredText}}"
+                on-enter="@this.fire('checkBlank', blank, 'enter')" 
+                on-change="@this.fire('checkBlank', blank, 'change')"
+                on-focus="@this.fire('focus', blank)"              
+                {{#(blank.isCorrect || blank.isShowingSolution)}}disabled="disabled"{{/if}} 
+                size="1"
+                class="h5p-text-input">
+          {{#each blank.choices}}
+            <option>{{this}}</option>
+          {{/each}}
+        </select>                     
+        {{#blank.hasHint}}
+          <span class="h5p-tip-container">
+            <button on-click="@this.fire('showHint', blank)" {{#(blank.isCorrect || blank.isShowingSolution)}}disabled="disabled"{{/if}}>
+              <span class="joubel-tip-container" title="Tip" aria-label="Tip" aria-expanded="true" role="button" tabindex="0"><span class="joubel-icon-tip-normal "><span class="h5p-icon-shadow"></span><span class="h5p-icon-speech-bubble"></span><span class="h5p-icon-info"></span></span></span>
+            </button>
+          </span>
+        {{/if}}     
+      </span>
+    {{/if}}
+  </span>
+`;
+
     var ractive = new Ractive({
       el: '#container_' + blank.id,
-      template: require('../views/blank.ractive.html'),
+      template: templateString,
       data: {
         isSelectCloze: this.isSelectCloze,
         blank: blank
