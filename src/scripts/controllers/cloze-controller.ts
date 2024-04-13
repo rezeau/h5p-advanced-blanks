@@ -236,7 +236,7 @@ export class ClozeController {
 
   private createBlankBinding(blank: Blank) {
   
-  // To solve this error: Uncaught Error: The template parser was passed a non-string template, but the template doesn't have a version.  Make sure you're passing in the template you think you are. I copy here the contents of file h5p-advanced-blanks\src\scripts\views\blank.ractive.html and converts it to one big string.
+  // To solve this error: Uncaught Error: The template parser was passed a non-string template, but the template doesn't have a version.  Make sure you're passing in the template you think you are. I copy here the contents of file h5p-advanced-blanks\src\scripts\views\blank.ractive.html and convert it to one big string.
   const templateString: string = `
   <span id="container{{id}}" class="blank {{#blank.hasPendingFeedback}}has-pending-feedback{{/if}} {{#blank.hasHint}}has-tip{{/if}} {{#blank.isCorrect}}correct{{/if}} {{#blank.isError}}error{{/if}} {{#blank.isRetry}}retry{{/if}} {{#blank.isShowingSolution}}showing-solution{{/if}}">
     {{#unless isSelectCloze}}

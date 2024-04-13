@@ -36,3 +36,9 @@ Copy all relevant files to ``dist`` directory
 ```bash
 npm run dist
 ```
+## Getting started on Windows powershell (Joseph Rézeau APRIL 2024)
+
+npm install -g npm@10.5.2
+npm run copy
+npm run watch
+npm run build
